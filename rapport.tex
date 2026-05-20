@@ -1,44 +1,120 @@
-\documentclass[a4paper,11pt]{article}
+\documentclass[12pt,a4paper]{article}
 
+% ── Encodage & langue ────────────────────────────────────────────────
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 
+% ── Mise en page ────────────────────────────────────────────────────
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.8cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% ── Polices ─────────────────────────────────────────────────────────
+% microtype disabled for compatibility
+
+% ── Couleurs & boîtes ───────────────────────────────────────────────
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% ── Tableaux ────────────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+
+% ── Code ────────────────────────────────────────────────────────────
 \usepackage{listings}
-\usepackage{xcolor}
-\usepackage{geometry}
-\usepackage{amsmath}
+
+% ── Maths ───────────────────────────────────────────────────────────
+\usepackage{amsmath, amssymb}
+
+% ── Graphiques & figures ────────────────────────────────────────────
 \usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, calc}
 
-\geometry{margin=2.5cm}
+% ── Liens hypertexte ────────────────────────────────────────────────
+\usepackage[colorlinks=true, linkcolor=MidnightBlue,
+            urlcolor=MidnightBlue, citecolor=MidnightBlue]{hyperref}
 
-\definecolor{codegray}{gray}{0.95}
+% ── En-têtes et pieds de page ───────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\textcolor{gray}{Projet Machine Learning — Heart Disease}}
+\fancyhead[R]{\small\textcolor{gray}{\thepage}}
+\fancyfoot[C]{\small\textcolor{gray}{Détection de maladies cardiaques par apprentissage automatique}}
 
-\lstset{
-	backgroundcolor=\color{codegray},
-	basicstyle=\ttfamily\small,
-	frame=single,
-	breaklines=true,
-	language=Python,
-	showstringspaces=false,
-	keywordstyle=\color{blue},
-	commentstyle=\color{gray},
-	stringstyle=\color{red},
-	upquote=true,
-	literate=
-	{é}{{\'e}}1
-	{è}{{\`e}}1
-	{ê}{{\^e}}1
-	{à}{{\`a}}1
-	{ç}{{\c c}}1
-	{ù}{{\`u}}1
-	{î}{{\^i}}1
-	{ô}{{\^o}}1
-	{É}{{\'E}}1
-	{È}{{\`E}}1
-	{À}{{\`A}}1
-	{Ç}{{\c C}}1
+% ── Couleurs personnalisées ─────────────────────────────────────────
+\definecolor{heartred}{RGB}{220, 38, 38}
+\definecolor{medblue}{RGB}{30, 64, 175}
+\definecolor{medgreen}{RGB}{5, 150, 105}
+\definecolor{medgray}{RGB}{107, 114, 128}
+\definecolor{lightgray}{RGB}{243, 244, 246}
+\definecolor{codebg}{RGB}{30, 30, 30}
+\definecolor{codegreen}{RGB}{52, 211, 153}
+\definecolor{purple}{RGB}{167, 139, 250}
+\definecolor{meorange}{RGB}{249, 115, 22}
+
+% ── Style des boîtes ────────────────────────────────────────────────
+\tcbset{
+  metricbox/.style={
+    colback=lightgray, colframe=medblue!30,
+    boxrule=0.5pt, arc=4pt, left=6pt, right=6pt, top=4pt, bottom=4pt
+  },
+  infobox/.style={
+    enhanced, colback=medblue!5, colframe=medblue!60,
+    boxrule=0.8pt, arc=4pt, breakable,
+    attach boxed title to top left={yshift=-2mm, xshift=4mm},
+    boxed title style={colback=medblue!60},
+    fonttitle=\bfseries\small
+  },
+  warnbox/.style={
+    enhanced, colback=meorange!8, colframe=meorange!50,
+    boxrule=0.8pt, arc=4pt, breakable,
+    attach boxed title to top left={yshift=-2mm, xshift=4mm},
+    boxed title style={colback=meorange!50},
+    fonttitle=\bfseries\small
+  },
+  resultbox/.style={
+    enhanced, colback=medgreen!5, colframe=medgreen!50,
+    boxrule=0.8pt, arc=4pt,
+    fonttitle=\bfseries\small
+  }
 }
+
+% ── Style de code ────────────────────────────────────────────────────
+\lstdefinestyle{pythonstyle}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize\color{white},
+  keywordstyle=\color{purple}\bfseries,
+  stringstyle=\color{codegreen},
+  commentstyle=\color{medgray}\itshape,
+  numberstyle=\tiny\color{medgray},
+  breaklines=true,
+  breakatwhitespace=true,
+  showstringspaces=false,
+  frame=none,
+  xleftmargin=8pt,
+  xrightmargin=4pt,
+  aboveskip=6pt,
+  belowskip=6pt,
+  language=Python,
+  morekeywords={True, False, None, import, from, as, def, class, return, if, else, elif, for, while, with, in, not, and, or},
+}
+
+% ── Commandes utilitaires ────────────────────────────────────────────
+\newcommand{\feat}[1]{\texttt{\textcolor{medblue}{#1}}}
+\newcommand{\model}[1]{\textbf{\textcolor{medblue}{#1}}}
+\newcommand{\metric}[1]{\textit{#1}}
+\newcommand{\best}[1]{\textbf{\textcolor{medgreen}{#1}}}
+
 
 \begin{document}
 	
@@ -83,9 +159,118 @@
 	
 	\newpage
 	
-	\section*{Introduction}
+	\section{Introduction}
 	
-	\addcontentsline{toc}{section}{Introduction}
-	
-	\section{Chargement des données :}
+	\subsection{Contexte clinique}
+
+	Les maladies cardiovasculaires constituent l'une des principales causes de mortalité dans le monde. Selon l'Organisation Mondiale de la Santé, elles sont responsables de près de 18 millions de décès par an, soit environ 31\,\% de la mortalité mondiale. Un diagnostic précoce et fiable est donc crucial pour permettre une prise en charge adaptée.
+
+	Le recours à des techniques d'apprentissage automatique (\textit{machine learning}) pour assister le diagnostic médical représente un domaine de recherche actif. L'objectif est de modéliser la relation entre des caractéristiques cliniques mesurables — pression artérielle, cholestérol, électrocardiogramme, etc. — et la présence d'une pathologie cardiaque.
+
+	\subsection{Objectifs du projet}
+
+	Ce projet vise à :
+	\begin{enumerate}
+	\item Charger, nettoyer et explorer le dataset \textit{Heart Disease UCI} ;
+	\item Analyser les distributions et corrélations des variables cliniques ;
+	\item Entraîner et évaluer trois algorithmes de classification supervisée ;
+	\item Comparer leurs performances sur plusieurs métriques ;
+	\item Identifier les variables les plus prédictives ;
+	\item Proposer des pistes d'amélioration pour la mise en production.
+	\end{enumerate}
+
+	\subsection{Organisation du rapport}
+
+	\begin{tcolorbox}[infobox, title={Structure du rapport}]
+		\textbf{Section 2} — Description du dataset et préparation des données \\
+		\textbf{Section 3} — Analyse exploratoire (EDA) \\
+		\textbf{Section 4} — Modèles de machine learning et entraînement \\
+		\textbf{Section 5} — Évaluation et comparaison des performances \\
+		\textbf{Section 6} — Interprétation des résultats \\
+		\textbf{Section 7} — Améliorations proposées \\
+		\textbf{Section 8} — Exportation et déploiement \\
+		\textbf{Section 9} — Conclusion
+	\end{tcolorbox}
+
+	\section{Dataset et Préparation des Données}
+
+	\subsection{Description du dataset}
+
+	Le dataset utilisé est le \textbf{Heart Disease UCI} (Cleveland Clinic Foundation), disponible sur le UCI Machine Learning Repository. Il contient des données médicales collectées sur \textbf{303 patients}.
+	\begin{table}[H]
+		\centering
+		\caption{Description des 14 variables du dataset}
+		\label{tab:variables}
+		\small
+		\begin{tabularx}{\textwidth}{llX}
+			\toprule
+			\textbf{Variable} & \textbf{Type} & \textbf{Description} \\
+			\midrule
+			\feat{age}      & Continue   & Âge du patient (en années) \\
+			\feat{sex}      & Binaire    & Sexe (0 = Femme, 1 = Homme) \\
+			\feat{cp}       & Catégorielle & Type de douleur thoracique (0–3) \\
+			\feat{trestbps} & Continue   & Pression artérielle au repos (mm Hg) \\
+			\feat{chol}     & Continue   & Cholestérol sérique (mg/dl) \\
+			\feat{fbs}      & Binaire    & Glycémie à jeun $>$ 120 mg/dl (0/1) \\
+			\feat{restecg}  & Catégorielle & Résultats ECG au repos (0–2) \\
+			\feat{thalach}  & Continue   & Fréquence cardiaque maximale atteinte \\
+			\feat{exang}    & Binaire    & Angine induite par l'exercice (0/1) \\
+			\feat{oldpeak}  & Continue   & Dépression du segment ST \\
+			\feat{slope}    & Catégorielle & Pente du segment ST (0–2) \\
+			\feat{ca}       & Ordinale   & Nombre de vaisseaux colorés (0–4) \\
+			\feat{thal}     & Catégorielle & Thalassémie (0, 1, 2, 3) \\
+			\feat{target}   & Binaire    & \textbf{Cible} : 0 = Sain, 1 = Maladie cardiaque \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	\subsection{Nettoyage des données}
+
+	Le pipeline de nettoyage appliqué comprend les étapes suivantes :
+
+	\begin{enumerate}
+	\item \textbf{Valeurs manquantes} : Vérification systématique — aucune valeur manquante détectée dans ce dataset.
+
+	\item \textbf{Doublons} : Identification et suppression des lignes dupliquées afin d'éviter tout biais dans l'entraînement.
+
+	\item \textbf{Cholestérol nul} : Les valeurs \feat{chol} $= 0$ sont physiologiquement impossibles et correspondent à des données manquantes encodées. Elles ont été remplacées par la \textbf{médiane} du cholestérol.
+
+	\item \textbf{Pression artérielle nulle} : Même traitement pour \feat{trestbps} $= 0$.
+	\end{enumerate}
+
+	\begin{tcolorbox}[warnbox, title={Distribution de la variable cible}]
+	\begin{itemize}
+		\item Classe 0 — Sain : \textbf{138 patients} (45{,}5\,\%)
+		\item Classe 1 — Maladie cardiaque : \textbf{165 patients} (54{,}5\,\%)
+	\end{itemize}
+	Le dataset est pratiquement \textbf{équilibré}, ce qui rend la métrique \metric{Accuracy} fiable et ne nécessite pas de rééchantillonnage (SMOTE).
+	\end{tcolorbox}
+
+	\section{Analyse Exploratoire des Données (EDA)}
+
+		\subsection{Distributions univariées}
+
+		\paragraph{Distribution de l'âge.} Les patients sont âgés de 29 à 77 ans, avec une médiane autour de 55 ans. Les patients malades sont légèrement plus jeunes en moyenne, ce qui peut sembler contre-intuitif mais s'explique par un biais de sélection de l'échantillon clinique.
+
+		\paragraph{Fréquence cardiaque maximale (\feat{thalach}).} Les patients sains présentent une fréquence cardiaque maximale plus élevée. Une \feat{thalach} élevée est généralement signe d'un système cardiovasculaire en meilleure santé.
+
+		\paragraph{Dépression du segment ST (\feat{oldpeak}).} Les patients malades affichent un \feat{oldpeak} plus élevé, ce qui est cohérent avec la physiopathologie de l'ischémie myocardique.
+
+		\subsection{Variables catégorielles vs cible}
+
+		\begin{table}[H]
+		\centering
+		\caption{Interprétation des variables catégorielles les plus discriminantes}
+		\label{tab:cat}
+		\begin{tabularx}{\textwidth}{lX}
+			\toprule
+			\textbf{Variable} & \textbf{Observation} \\
+			\midrule
+			\feat{cp} (douleur thoracique) & La douleur asymptomatique (type 0) est fortement associée aux patients malades — paradoxe clinique important \\
+			\feat{thal} (thalassémie) & Le type 2 (flux normal) est associé à l'absence de maladie ; les types 1 et 3 (défects) au groupe malade \\
+			\feat{slope} (pente ST) & Une pente descendante est plus fréquente chez les malades \\
+			\feat{ca} (vaisseaux colorés) & Plus le nombre de vaisseaux colorés est élevé, plus le risque de maladie augmente \\
+			\bottomrule
+		\end{tabularx}
+		\end{table}
 \end{document}
