@@ -1,0 +1,91 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\geometry{margin=2.5cm}
+
+\definecolor{codegray}{gray}{0.95}
+
+\lstset{
+	backgroundcolor=\color{codegray},
+	basicstyle=\ttfamily\small,
+	frame=single,
+	breaklines=true,
+	language=Python,
+	showstringspaces=false,
+	keywordstyle=\color{blue},
+	commentstyle=\color{gray},
+	stringstyle=\color{red},
+	upquote=true,
+	literate=
+	{é}{{\'e}}1
+	{è}{{\`e}}1
+	{ê}{{\^e}}1
+	{à}{{\`a}}1
+	{ç}{{\c c}}1
+	{ù}{{\`u}}1
+	{î}{{\^i}}1
+	{ô}{{\^o}}1
+	{É}{{\'E}}1
+	{È}{{\`E}}1
+	{À}{{\`A}}1
+	{Ç}{{\c C}}1
+}
+
+\begin{document}
+	
+	\begin{titlepage}
+		\centering
+		
+		\vspace*{1cm}
+		
+		\includegraphics[width=0.5\textwidth]{./images/Logo-insi-fond-transparent.png}
+		
+		\vspace{1cm}
+		
+		{\Huge \textbf{Institut National et Supérieur de l'Informatique} \par}
+		
+		\vspace{1cm}
+		
+		{\large \textbf{Mention Informatique -- Parcours Intelligence Artificielle et Data Science} \par}
+		
+		\vspace{2cm}
+		
+		{\Huge \textbf{Examen Machine Learning} \par}
+		
+		\vspace{3cm}
+		
+		{\large \textbf{Présenté par :} RASOLOFOMANANA Aina Herilanja \par}
+		
+		{\large\textbf{Matricule : } 126/LA/25-26 \par}
+		
+		\vspace{0.5cm}
+		
+		{\large\textbf{Profe : } Dr.RAMASONDRANO Andriamanjaka \par}
+		\vfill
+		
+		{\large \today \par}
+		
+	\end{titlepage}
+	\clearpage
+	
+	\tableofcontents
+	
+	\thispagestyle{empty}
+	
+	\newpage
+	
+	\section*{Introduction}
+	
+	\addcontentsline{toc}{section}{Introduction}
+	
+	\section{Chargement des données :}
+\end{document}
