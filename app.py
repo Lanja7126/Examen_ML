@@ -24,7 +24,7 @@ import streamlit as st
 # CONFIG PAGE
 
 st.set_page_config(
-    page_title="Heart Disease Predictor",
+    page_title="Détection de maladie cardiaque",
     page_icon="❤️",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -278,7 +278,7 @@ with left_col:
                           help="Seuil de probabilité pour classer un patient comme malade.")
 
     st.markdown("---")
-    st.markdown('<div class="section-title">🩺 Paramètres cliniques</div>',
+    st.markdown('<div class="section-title"> Paramètres cliniques</div>',
                 unsafe_allow_html=True)
 
     c1, c2 = st.columns(2)
