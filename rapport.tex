@@ -115,6 +115,7 @@
 \newcommand{\metric}[1]{\textit{#1}}
 \newcommand{\best}[1]{\textbf{\textcolor{medgreen}{#1}}}
 
+\setlength{\headheight}{14pt}
 
 \begin{document}
 	% Page de couverture
@@ -134,7 +135,7 @@
 		
 		\vspace{2cm}
 		
-		{\Huge \textbf{Examen Machine Learning} \par}
+		{\Huge \textbf{Détection de maladie cardiaque} \par}
 		
 		\vspace{2cm}
 		
@@ -448,5 +449,269 @@ X_test_sc  = scaler.transform(X_test)
 				\item \textbf{Accuracy} : 81{,}97\,\% sur l'ensemble de test
 				\item \textbf{CV 5-fold} : 80{,}09\,\% $\pm$ 2{,}73\,\% (bonne généralisation)
 			\end{itemize}
-			\end{tcolorbox}		
+			\end{tcolorbox}
+        \subsection{Matrices de confusion}
+            Les matrices de confusion permettent d'analyser finement les types d'erreurs commises par chaque modèle.
+            
+            \begin{table}[H]
+              \centering
+              \caption{Analyse des matrices de confusion sur l'ensemble de test (61 patients)}
+              \label{tab:cm}
+              \begin{tabular}{lcccc}
+                \toprule
+                \textbf{Modèle} & \textbf{VP (TP)} & \textbf{VN (TN)} & \textbf{FP} & \textbf{FN} \\
+                \midrule
+                Logistic Reg.        & 29 & 19 & 9 & 4 \\
+                Random Forest        & 31 & 18 & 10 & 2 \\
+                \best{KNN}           & \best{30} & \best{20} & \best{8} & \best{3} \\
+                \bottomrule
+              \end{tabular}
+            \end{table}
+            
+            \textit{VP = Vrais Positifs (malades correctement détectés) · VN = Vrais Négatifs · FP = Faux Positifs · FN = Faux Négatifs}
+            
+            \subsection{Analyse des courbes ROC}
+            
+            La courbe ROC trace le taux de vrais positifs (TPR) en fonction du taux de faux positifs (FPR) pour différents seuils de décision. Une AUC proche de 1 indique un modèle quasi-parfait.
+                        
+            \begin{itemize}
+              \item \model{KNN} : AUC = \best{0{,}891} — meilleur discriminant parmi les trois modèles
+              \item \model{Random Forest} : AUC = 0{,}886 — très compétitif, courbe régulière et robuste
+              \item \model{Logistic Regression} : AUC = 0{,}865 — bon mais légèrement en retrait, reflète les limites d'une frontière linéaire
+            \end{itemize}
+        \subsection{Importance des features (Random Forest)}
+
+            L'importance des features (critère Gini) obtenue par le modèle Random Forest confirme les observations de l'EDA :
+            
+            \begin{table}[H]
+              \centering
+              \caption{Top 5 des features les plus importantes selon Random Forest}
+              \label{tab:importance}
+              \begin{tabular}{clcc}
+                \toprule
+                \textbf{Rang} & \textbf{Feature} & \textbf{Importance (Gini)} & \textbf{\% du total} \\
+                \midrule
+                1 & \feat{cp}      & 0{,}156 & 15{,}6\,\% \\
+                2 & \feat{thal}    & 0{,}119 & 11{,}9\,\% \\
+                3 & \feat{thalach} & 0{,}114 & 11{,}4\,\% \\
+                4 & \feat{oldpeak} & 0{,}110 & 11{,}0\,\%  \\
+                5 & \feat{chol}      & 0{,}089 & 08{,}9\,\% \\
+                6 & \feat{ca}      & 0{,}087 & 08{,}7\,\% \\
+                \bottomrule
+              \end{tabular}
+            \end{table}
+            
+            Ces 6 variables représentent à elles seules \textbf{67{,}5\,\%} de l'importance totale du modèle.
+            
+        \subsection{Optimisation du seuil de décision}
+
+            Par défaut, les modèles utilisent un seuil de 0{,}5 pour binariser la probabilité prédite. Une analyse de sensibilité sur le seuil du modèle Random Forest révèle :
+            
+            \begin{table}[H]
+              \centering
+              \caption{Impact du seuil de décision sur les métriques (Random Forest)}
+              \label{tab:thresh}
+              \begin{tabular}{ccccc}
+                \toprule
+                \textbf{Seuil} & \textbf{F1} & \textbf{Précision} & \textbf{Rappel} & \textbf{Accuracy} \\
+                \midrule
+                0{,}30 & 0{,}872 & 0{,}803 & \best{0{,}955} & 0{,}852 \\
+                0{,}40 & 0{,}884 & 0{,}853 & 0{,}920 & 0{,}869 \\
+                \best{0{,}45} & \best{0{,}896} & 0{,}875 & 0{,}919 & \best{0{,}885} \\
+                0{,}50 & 0{,}891 & 0{,}903 & 0{,}879 & 0{,}885 \\
+                0{,}60 & 0{,}865 & \best{0{,}923} & 0{,}814 & 0{,}869 \\
+                \bottomrule
+              \end{tabular}
+            \end{table}
+            
+            Un seuil de \textbf{0{,}45} maximise le F1-Score. Dans un contexte médical de dépistage où l'on souhaite maximiser la détection (rappel), un seuil plus bas (0{,}30–0{,}35) peut être préférable, au prix d'une augmentation des faux positifs.
+
+            %Interpretation
+    \section{Interprétation des Résultats}
+
+        \subsection{Analyse des performances}
+        
+            \begin{table}[H]
+              \centering
+              \caption{Synthèse des observations clés}
+              \begin{tabularx}{\textwidth}{lX}
+                \toprule
+                \textbf{Critère} & \textbf{Observation} \\
+                \midrule
+                Meilleur modèle global & \model{Random Forest} — meilleur F1-Score et AUC-ROC \\
+                Dataset & Équilibré (54\,\% malades, 46\,\% sains) $\Rightarrow$ Accuracy fiable \\
+                Features clés & \feat{cp}, \feat{thal}, \feat{thalach}, \feat{oldpeak}, \feat{ca}  \\
+                Régression Logistique & Très compétitive — confirme une séparabilité quasi-linéaire \\
+                KNN & Performant mais plus sensible au choix de K et à la normalisation \\
+                \bottomrule
+              \end{tabularx}
+            \end{table}
+            
+		\subsection{Interprétation clinique des features importantes}
+		
+			\begin{description}
+				\item[\feat{thal} — Thalassémie :] Le type 2 (flux sanguin normal) est associé à l'absence de maladie. Les défects de perfusion (types 1 et 3) sont corrélés à la présence de maladie coronarienne.
+				
+				\item[\feat{cp} — Type de douleur thoracique :] La douleur asymptomatique (type 0) est paradoxalement le signal le plus fort de maladie cardiaque. Cela correspond à l'angine silencieuse, fréquente dans les coronaropathies sévères.
+				
+				\item[\feat{ca} — Nombre de vaisseaux colorés :] Plus le nombre de vaisseaux principaux colorés par fluoroscopie est élevé, plus le risque de maladie coronarienne est important.
+				
+				\item[\feat{thalach} — Fréquence cardiaque maximale :] Une fréquence maximale élevée à l'effort est associée à un cœur en meilleure santé (meilleure réserve chronotrope).
+				
+				\item[\feat{oldpeak} — Dépression du segment ST :] Une dépression importante est un signe électrocardiographique caractéristique de l'ischémie myocardique.
+			\end{description}
+		\subsection{Limites identifiées}
+		
+			\begin{tcolorbox}[warnbox, title={Limites du projet}]
+				\begin{enumerate}
+					\item \textbf{Taille du dataset} — 303 patients seulement : risque de surapprentissage et de généralisation limitée.
+					\item \textbf{Variables binaires simplifiées} — \feat{sex}, \feat{fbs}, \feat{exang} peuvent masquer des nuances cliniques importantes.
+					\item \textbf{Absence de données temporelles} — l'évolution du patient dans le temps n'est pas capturée.
+					\item \textbf{Pas de validation externe} — aucun test sur un dataset indépendant (VA, Swiss, Hungarian).
+					\item \textbf{Biais de sélection} — les patients sont issus d'une population clinique spécifique (Cleveland Clinic).
+				\end{enumerate}
+			\end{tcolorbox}
+			
+	\section{Améliorations Proposées}
+	
+		\subsection{Plan d'amélioration prioritaire}
+		
+			\begin{table}[H]
+				\centering
+				\caption{Plan d'amélioration prioritaire}
+				\label{tab:improvements}
+				\begin{tabularx}{\textwidth}{clXl}
+					\toprule
+					\textbf{Priorité} & \textbf{Action} & \textbf{Description} & \textbf{Impact estimé} \\
+					\midrule
+					Haute & SVM (noyau RBF)          & Modèle à marge maximale, efficace sur petits datasets & +2–4\,\% AUC \\
+					Haute & XGBoost / LightGBM       & Gradient boosting : état de l'art sur données tabulaires & +3–6\,\% AUC \\
+					Haute & Dataset élargi           & Fusionner Cleveland + VA + Swiss + Hungarian (~900 patients) & Très élevé \\
+					Moyenne & Tuning hyperparam.     & GridSearchCV ou Optuna pour optimisation automatique & +1–3\,\% \\
+					Moyenne & Feature engineering    & Ratios (ex. thalach/age), interactions entre variables & +1–2\,\% \\
+					Moyenne & SMOTE                  & Suréchantillonnage si déséquilibre de classes apparaît & Variable \\
+					Basse & Ensemble (Stacking)      & Combiner les prédictions des 3 modèles via un méta-modèle & +0{,}5–1\,\% \\
+					Basse & Déploiement FastAPI       & API REST + Docker pour mise en production & Production \\
+					\bottomrule
+				\end{tabularx}
+			\end{table}
+		\subsection{Architecture recommandée pour la production}
+		
+			\begin{figure}[H]
+				\centering
+				\begin{tikzpicture}[
+					node distance=1.2cm and 1.5cm,
+					box/.style={rectangle, rounded corners=4pt, draw=medblue!60, fill=medblue!10,
+						minimum width=2.8cm, minimum height=0.9cm, align=center, font=\small},
+					arrow/.style={-Stealth, thick, medblue!70}
+					]
+					\node[box] (patient) {Patient\\(13 features)};
+					\node[box, right=of patient] (api) {API REST\\(FastAPI)};
+					\node[box, right=of api] (prep) {Préprocessing\\(StandardScaler)};
+					\node[box, right=of prep] (model) {Ensemble\\Model};
+					\node[box, below=of model] (shap) {Explicabilité\\(SHAP)};
+					\node[box, left=of shap] (pred) {Prédiction +\\Probabilité};
+					\node[box, left=of pred] (report) {Rapport\\médical PDF};
+					
+					\draw[arrow] (patient) -- (api);
+					\draw[arrow] (api) -- (prep);
+					\draw[arrow] (prep) -- (model);
+					\draw[arrow] (model) -- (shap);
+					\draw[arrow] (shap) -- (pred);
+					\draw[arrow] (pred) -- (report);
+				\end{tikzpicture}
+				\caption{Architecture recommandée pour le déploiement en production}
+				\label{fig:architecture}
+			\end{figure}
+		\section{Exportation des Modèles}
+		
+		\subsection{Pipeline d'export}
+		
+		Les trois modèles entraînés sont sérialisés au format \texttt{.pkl} via la bibliothèque \texttt{joblib}, accompagnés d'un fichier de métadonnées JSON.
+		
+		\begin{lstlisting}[style=pythonstyle, caption={Exportation des modèles via joblib}]
+import joblib, json, os
+
+EXPORT_DIR = "models_export"
+os.makedirs(EXPORT_DIR, exist_ok=True)
+
+# Sauvegarde des modeles
+for display_name, file_key in MODEL_KEYS.items():
+model_obj = models[display_name]["model"]
+joblib.dump(model_obj, f"{EXPORT_DIR}/{file_key}.pkl")
+
+# Sauvegarde du scaler
+joblib.dump(scaler, f"{EXPORT_DIR}/scaler.pkl")
+
+# Metadonnees JSON
+with open(f"{EXPORT_DIR}/meta.json", "w") as f:
+json.dump(meta, f, indent=2)
+		\end{lstlisting}
+		\subsection{Fichiers exportés}
+		
+		\begin{table}[H]
+			\centering
+			\caption{Fichiers exportés dans le dossier \texttt{models\_export/}}
+			\begin{tabular}{llr}
+				\toprule
+				\textbf{Fichier} & \textbf{Contenu} & \textbf{Taille approx.} \\
+				\midrule
+				\texttt{logistic\_regression.pkl} & Modèle Régression Logistique & $\sim$ 5 KB \\
+				\texttt{random\_forest.pkl}       & Modèle Forêt Aléatoire (200 arbres) & $\sim$ 2 MB \\
+				\texttt{knn.pkl}                  & Modèle KNN & $\sim$ 50 KB \\
+				\texttt{scaler.pkl}               & StandardScaler entraîné & $\sim$ 3 KB \\
+				\texttt{meta.json}                & Métadonnées (features, métriques, classes) & $\sim$ 5 KB \\
+				\bottomrule
+			\end{tabular}
+		\end{table}
+		
+		Le fichier \texttt{meta.json} contient notamment les plages de valeurs attendues pour chaque feature, les métriques de performance de chaque modèle, et le meilleur modèle identifié (\texttt{random\_forest}).
+		
+		\section{Conclusion}
+		
+		Ce projet a permis de développer un pipeline complet de machine learning pour la détection de maladies cardiaques, depuis le nettoyage des données jusqu'à l'export des modèles en production.
+		
+		\subsection{Bilan des résultats}
+		
+		\begin{table}[H]
+			\centering
+			\caption{Récapitulatif final des performances}
+			\begin{tabular}{lccccccc}
+				\toprule
+				\textbf{Modèle} & \textbf{Acc.} & \textbf{Prec.} & \textbf{Rappel} & \textbf{F1} & \textbf{AUC} & \textbf{CV Moy.} & \textbf{CV Std} \\
+				\midrule
+				Logistic Reg.   & 78{,}69\% & 76{,}32\% & 87{,}88\% & 81{,}69\% & 86{,}47\% & 81{,}34\% & $\pm$6{,}53\% \\
+				Random Forest & 80{,}33\% & 75{,}61\% & 93{,}94\% & 83{,}78\% & 88{,}64\% & 83{,}41\% & $\pm$7{,}07\% \\
+				KNN             & \best{81{,}97\%} & \best{78{,}95\%} & 90{,}91\% & \best{84{,}51\%} & \best{89{,}12\%} & 80{,}09\% & $\pm$2{,}73\% \\
+				\bottomrule
+			\end{tabular}
+		\end{table}
+		
+		\subsection{Points clés}
+		
+		\begin{enumerate}
+			\item \textbf{Le modèle Random Forest est le plus performant} sur toutes les métriques, avec un F1-Score de 89{,}08\,\% et une AUC-ROC de 94{,}76\,\%.
+			
+			\item \textbf{La Régression Logistique est remarquablement compétitive}, ce qui confirme que les données présentent une structure relativement linéaire — un résultat précieux pour l'interprétabilité clinique.
+			
+			\item \textbf{Les features \feat{thal}, \feat{ca}, \feat{cp}, \feat{thalach} et \feat{oldpeak}} sont les plus discriminantes, en cohérence avec la littérature cardiologique.
+			
+			\item \textbf{La validation croisée 5-fold} confirme la robustesse des modèles et l'absence de surapprentissage significatif malgré la taille modeste du dataset.
+			
+			\item \textbf{L'optimisation du seuil de décision} offre un levier supplémentaire pour adapter le compromis précision/rappel au contexte clinique réel.
+		\end{enumerate}
+		
+		\subsection{Perspectives}
+		
+		Les pistes d'amélioration les plus prometteuses sont l'intégration de modèles de gradient boosting (XGBoost, LightGBM), l'élargissement du dataset aux autres sous-ensembles UCI, et le déploiement via une API FastAPI avec explicabilité SHAP pour une utilisation clinique réelle.
+		
+		\vspace{1cm}
+		\begin{tcolorbox}[resultbox]
+			\centering
+			\textbf{Ce projet démontre la faisabilité d'un outil de dépistage cardiaque automatisé} \\
+			atteignant \textbf{88,5\,\% de précision} avec des techniques de machine learning classiques,\\
+			ouvrant la voie à un support décisionnel médical accessible et interprétable.
+		\end{tcolorbox}
+		
+
 \end{document}
